@@ -12,7 +12,7 @@ function log_add() {
 	echo -ne "$1" >> $log_file
 }
 function log_err() {
-	echo -ne "\n`now_time` [ERR} $1" >> $log_file
+	echo -ne "\n`now_time` [ERR] $1" >> $log_file
 }
 
 log_info "Start installation\n"
