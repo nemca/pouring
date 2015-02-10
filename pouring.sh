@@ -112,44 +112,46 @@ function os_setup_pre() {
 	log_add "passed\n"
 }
 
-# Copy and untar rootfs
-log_info "Copy and untar rootfs... "
-err_msg=`cd /mnt && tar xzf /srv/images/niitp-ubuntu-minimal-amd64.tgz 2>&1 1>/dev/null`
-if [[ $? != 0 ]]; then
-	log_err "\nCan't extrat rootfs from the archive: $err_msg \n"
-	exit 6
-fi
-cd /
-log_add "passed\n"
+function os_setup() {
+	# Copy and untar rootfs
+	log_info "Copy and untar rootfs... "
+	err_msg=`cd /mnt && tar xzf /srv/images/$archive 2>&1 1>/dev/null`
+	if [[ $? != 0 ]]; then
+		log_err "\nCan't extrat rootfs from the archive: $err_msg \n"
+		exit 6
+	fi
+	cd /
+	log_add "passed\n"
 
-# Install GRUB
-log_info "Install GRUB... "
-err_msg=`grub-install --root-directory=/mnt /dev/sda 2>&1 1>/dev/null`
-if [[ $? != 0 ]]; then
-	log_err "\nCan't install grub: $err_msg \n"
-	exit 7
-fi
-log_add "passed\n"
+	# Install GRUB
+	log_info "Install GRUB... "
+	err_msg=`grub-install --root-directory=/mnt /dev/$root_dev 2>&1 1>/dev/null`
+	if [[ $? != 0 ]]; then
+		log_err "\nCan't install grub: $err_msg \n"
+		exit 7
+	fi
+	log_add "passed\n"
 
-# Mount dev, sys, proc
-log_info "Mount dev, sys, proc... "
-err_msg=`mount -t proc none /mnt/proc && mount --bind /dev/ /mnt/dev/ && mount --bind /sys/ /mnt/sys/ 2>&1 1>/dev/null`
-if [[ $? != 0 ]]; then
-	log_err "\nFailed mount dev,sys,proc: $err_msg \n"
-	exit 9
-fi
-log_add "passed\n"
+	# Mount dev, sys, proc
+	log_info "Mount dev, sys, proc... "
+	err_msg=`mount -t proc none /mnt/proc && mount --bind /dev/ /mnt/dev/ && mount --bind /sys/ /mnt/sys/ 2>&1 1>/dev/null`
+	if [[ $? != 0 ]]; then
+		log_err "\nFailed mount dev,sys,proc: $err_msg \n"
+		exit 9
+	fi
+	log_add "passed\n"
 
-# Update GRUB
-log_info "Update GRUB in chroot... "
-err_msg=`chroot /mnt/ update-grub 2>&1 1>/dev/null`
-if [[ $? != 0 ]]; then
-	log_err "\nFailed run update-grub in chroot: $err_msg \n"
-	exit 9
-fi
-log_add "passed\n"
+	# Update GRUB
+	log_info "Update GRUB in chroot... "
+	err_msg=`chroot /mnt/ update-grub 2>&1 1>/dev/null`
+	if [[ $? != 0 ]]; then
+		log_err "\nFailed run update-grub in chroot: $err_msg \n"
+		exit 9
+	fi
+	log_add "passed\n"
 
-log_info "Installation was successful!\n"
+	log_info "Installation was successful!\n"
+}
 
 # Show must go on!
 # Umount proc, sys, dev
