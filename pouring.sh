@@ -82,14 +82,16 @@ function mk_rootfs_part() {
 	log_add "passed\n"
 }
 
-# create ext4 filesystem
-log_info "Create ext4 filesystem... "
-err_msg=`mkfs.ext4 /dev/sda1 2>&1 1>/dev/null`
-if [[ $? != 0 ]]; then
-	log_err "\nCan't create filesystem: $err_msg \n"
-	exit 3
-fi
-log_add "passed\n"
+function mk_rootfs() {
+	# create ext4 filesystem
+	log_info "Create ext4 filesystem... "
+	err_msg=`mkfs.ext4 /dev/${root_dev}1 2>&1 1>/dev/null`
+	if [[ $? != 0 ]]; then
+		log_err "\nCan't create filesystem: $err_msg \n"
+		exit 3
+	fi
+	log_add "passed\n"
+}
 
 # check mount dir
 log_info "Check mount dir... "
