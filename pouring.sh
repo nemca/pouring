@@ -153,24 +153,26 @@ function os_setup() {
 	log_info "Installation was successful!\n"
 }
 
-# Show must go on!
-# Umount proc, sys, dev
-log_info "Umount dev, sys, proc... "
-for mount_point in proc sys dev; do
-	err_msg=`umount /mnt/$mount_point 2>&1 1>/dev/null`
-	if [[ $? != 0 ]]; then
-		log_err "\n/dev/$mount_point mount is mounted. Try unmount failed: $err_msg \n"
-		exit 10
-	fi
-done
-log_add "passed\n"
+function os_setup_post() {
+	# Show must go on!
+	# Umount proc, sys, dev
+	log_info "Umount dev, sys, proc... "
+	for mount_point in proc sys dev; do
+		err_msg=`umount /mnt/$mount_point 2>&1 1>/dev/null`
+		if [[ $? != 0 ]]; then
+			log_err "\n/dev/$mount_point mount is mounted. Try unmount failed: $err_msg \n"
+			exit 10
+		fi
+	done
+	log_add "passed\n"
 
-# Umount rootfs
-log_info "Umount rootfs... "
-err_msg=`umount /dev/sda1 2>&1 1>/dev/null`
-if [[ $? != 0 ]]; then
-	log_err "\n/dev/$mount_point mount is mounted. Try unmount failed: $err_msg \n"
-	exit 11
-fi
-log_add "passed\n"
-log_info "DONE.\n"
+	# Umount rootfs
+	log_info "Umount rootfs... "
+	err_msg=`umount /dev/${root_dev}1 2>&1 1>/dev/null`
+	if [[ $? != 0 ]]; then
+		log_err "\n/dev/${root_dev}1 mount is mounted. Try unmount failed: $err_msg \n"
+		exit 11
+	fi
+	log_add "passed\n"
+	log_info "DONE.\n"
+}
