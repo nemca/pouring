@@ -12,8 +12,28 @@ function log_add() {
 	echo -ne "$1" >> $log_file
 }
 function log_err() {
-	echo -ne "\n`now_time` [ERR] $1" >> $log_file
+	echo -ne "\n`now_time` [ERR} $1" >> $log_file
 }
+
+# get config
+path_to_confs="/etc/pouring"
+function get_config_name {
+	boot_parm=`sed 's/ /\n/g' /proc/cmdline 2>/dev/null`
+
+	for st in $boot_parm; do
+		echo $st | egrep 'conf=(.*)' 1>/dev/null 2>&1
+		if [[ $? -eq 0 ]]; then
+			echo $st | sed 's/conf=//' 2>/dev/null
+		fi
+	done
+}
+
+config=`get_config_name()`
+if [[ -f $path_to_confs/$config ]]; then
+	source $path_to_confs/$config
+else
+	log_err "Can't read configuration file\n"
+fi
 
 log_info "Start installation\n"
 
@@ -139,7 +159,7 @@ for mount_point in proc sys dev; do
 done
 log_add "passed\n"
 
-# Unount rootfs
+# Umount rootfs
 log_info "Umount rootfs... "
 err_msg=`umount /dev/sda1 2>&1 1>/dev/null`
 if [[ $? != 0 ]]; then
