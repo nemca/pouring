@@ -182,3 +182,6 @@ function os_setup_post() {
 	log_info "DONE.\n"
 }
 os_setup_post
+
+# reboot host
+reboot
