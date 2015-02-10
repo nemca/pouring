@@ -18,14 +18,7 @@ function log_err() {
 # get config
 path_to_confs="/etc/pouring"
 function get_config_name() {
-	boot_parm=`sed 's/ /\n/g' /proc/cmdline 2>/dev/null`
-
-	for st in $boot_parm; do
-		echo $st | egrep 'conf=(.*)' 1>/dev/null 2>&1
-		if [[ $? -eq 0 ]]; then
-			echo $st | sed 's/conf=//' 2>/dev/null
-		fi
-	done
+	sed -nre 's/(^config=|^.* config=)([^ ]+)/\2/; T; p' /proc/cmdline
 }
 
 # read config
