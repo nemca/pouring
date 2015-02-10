@@ -17,7 +17,7 @@ function log_err() {
 
 # get config
 path_to_confs="/etc/pouring"
-function get_config_name {
+function get_config_name() {
 	boot_parm=`sed 's/ /\n/g' /proc/cmdline 2>/dev/null`
 
 	for st in $boot_parm; do
