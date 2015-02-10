@@ -29,7 +29,7 @@ fi
 if [[ -f $path_to_confs/$config ]]; then
 	source $path_to_confs/$config
 else
-	log_err "Can't read configuration file\n"
+	log_err "Can't read configuration file\n" && exit 1
 fi
 
 log_info "Start installation\n"
