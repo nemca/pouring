@@ -74,7 +74,7 @@ function mk_rootfs_part_pre() {
 function mk_rootfs_part() {
 	# create DOS partition table and a new partition
 	log_info "Create DOS partition table and a new partition... "
-	err_msg=`echo -e "o\nn\np\n1\n\n\nw" | fdisk /dev/sda 2>&1 1>/dev/null`
+	err_msg=`echo -e "o\nn\np\n1\n\n\nw" | fdisk /dev/$root_dev 2>&1 1>/dev/null`
 	if [[ $? != 0 ]]; then
 		log_err "\nCan't create new partition: $err_msg \n"
 		exit 2
