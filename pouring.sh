@@ -41,7 +41,7 @@ function mk_rootfs_part_pre() {
 		log_err "Not found disks"
 		exit 1
 	fi
-	log_add "passed\n"
+	log_add "ok\n"
 
 	# Check already mounted dev, sys, proc 
 	log_info "Check already mounted dev, sys, proc... "
@@ -55,7 +55,7 @@ function mk_rootfs_part_pre() {
 			fi
 		fi
 	done
-	log_add "passed\n"
+	log_add "ok\n"
 
 	# check already mounted rootfs
 	log_info "Check already mounted rootfs... "
@@ -68,7 +68,7 @@ function mk_rootfs_part_pre() {
 			exit 4
 		fi
 	fi
-	log_add "passed\n"
+	log_add "ok\n"
 }
 mk_rootfs_part_pre
 
@@ -80,7 +80,7 @@ function mk_rootfs_part() {
 		log_err "\nCan't create new partition: $err_msg \n"
 		exit 2
 	fi
-	log_add "passed\n"
+	log_add "ok\n"
 }
 mk_rootfs_part
 
@@ -92,7 +92,7 @@ function mk_rootfs() {
 		log_err "\nCan't create filesystem: $err_msg \n"
 		exit 3
 	fi
-	log_add "passed\n"
+	log_add "ok\n"
 }
 mk_rootfs
 
@@ -103,7 +103,7 @@ function os_setup_pre() {
 		log_info "\nCreate direcrory /mnt \n"
 		mkdir /mnt
 	fi
-	log_add "passed\n"
+	log_add "ok\n"
 
 	# mount local disk
 	log_info "Mount local disk... "
@@ -112,7 +112,7 @@ function os_setup_pre() {
 		log_err "\nCan't mount local filesystem: $err_msg \n"
 		exit 5
 	fi
-	log_add "passed\n"
+	log_add "ok\n"
 }
 os_setup_pre
 
@@ -125,7 +125,7 @@ function os_setup() {
 		exit 6
 	fi
 	cd /
-	log_add "passed\n"
+	log_add "ok\n"
 
 	# Install GRUB
 	log_info "Install GRUB... "
@@ -134,7 +134,7 @@ function os_setup() {
 		log_err "\nCan't install grub: $err_msg \n"
 		exit 7
 	fi
-	log_add "passed\n"
+	log_add "ok\n"
 
 	# Mount dev, sys, proc
 	log_info "Mount dev, sys, proc... "
@@ -143,7 +143,7 @@ function os_setup() {
 		log_err "\nFailed mount dev,sys,proc: $err_msg \n"
 		exit 9
 	fi
-	log_add "passed\n"
+	log_add "ok\n"
 
 	# Update GRUB
 	log_info "Update GRUB in chroot... "
@@ -152,7 +152,7 @@ function os_setup() {
 		log_err "\nFailed run update-grub in chroot: $err_msg \n"
 		exit 9
 	fi
-	log_add "passed\n"
+	log_add "ok\n"
 
 	log_info "Installation was successful!\n"
 }
@@ -169,7 +169,7 @@ function os_setup_post() {
 			exit 10
 		fi
 	done
-	log_add "passed\n"
+	log_add "ok\n"
 
 	# Umount rootfs
 	log_info "Umount rootfs... "
@@ -178,7 +178,7 @@ function os_setup_post() {
 		log_err "\n/dev/${root_dev}1 mount is mounted. Try unmount failed: $err_msg \n"
 		exit 11
 	fi
-	log_add "passed\n"
+	log_add "ok\n"
 	log_info "DONE.\n"
 }
 os_setup_post
