@@ -23,6 +23,9 @@ function get_config_name() {
 
 # read config
 config=`get_config_name()`
+if [[ -z $config ]]; then
+	log_err "No configuration file is specified\n" && exit 1
+fi
 if [[ -f $path_to_confs/$config ]]; then
 	source $path_to_confs/$config
 else
