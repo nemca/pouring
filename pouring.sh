@@ -93,23 +93,24 @@ function mk_rootfs() {
 	log_add "passed\n"
 }
 
-# check mount dir
-log_info "Check mount dir... "
-if [[ ! -d /mnt ]]; then
-	log_info "\nCreate direcrory /mnt \n"
-	mkdir /mnt
-fi
-log_add "passed\n"
+function os_setup_pre() {
+	# check mount dir
+	log_info "Check mount dir... "
+	if [[ ! -d /mnt ]]; then
+		log_info "\nCreate direcrory /mnt \n"
+		mkdir /mnt
+	fi
+	log_add "passed\n"
 
-
-# mount local disk
-log_info "Mount local disk... "
-err_msg=`mount -t ext4 /dev/sda1 /mnt/ 2>&1 1>/dev/null`
-if [[ $? != 0 ]]; then
-	log_err "\nCan't mount local filesystem: $err_msg \n"
-	exit 5
-fi
-log_add "passed\n"
+	# mount local disk
+	log_info "Mount local disk... "
+	err_msg=`mount -t ext4 /dev/${root_dev}1 /mnt/ 2>&1 1>/dev/null`
+	if [[ $? != 0 ]]; then
+		log_err "\nCan't mount local filesystem: $err_msg \n"
+		exit 5
+	fi
+	log_add "passed\n"
+}
 
 # Copy and untar rootfs
 log_info "Copy and untar rootfs... "
