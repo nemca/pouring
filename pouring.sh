@@ -18,7 +18,7 @@ function log_err() {
 # get config
 path_to_confs="/etc/pouring"
 function get_config_name() {
-	sed -nre 's/(^config=|^.* config=)([^ ]+)/\2/; T; p' /proc/cmdline
+	sed -nre 's/(^config=|^.* config=)([^ ]+).*$/\2/; T; p' /proc/cmdline
 }
 
 # read config
