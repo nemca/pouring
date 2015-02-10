@@ -22,7 +22,7 @@ function get_config_name() {
 }
 
 # read config
-config=`get_config_name()`
+config=`get_config_name`
 if [[ -z $config ]]; then
 	log_err "No configuration file is specified\n" && exit 1
 fi
@@ -70,7 +70,7 @@ function mk_rootfs_part_pre() {
 	fi
 	log_add "passed\n"
 }
-mk_rootfs_part_pre()
+mk_rootfs_part_pre
 
 function mk_rootfs_part() {
 	# create DOS partition table and a new partition
@@ -82,7 +82,7 @@ function mk_rootfs_part() {
 	fi
 	log_add "passed\n"
 }
-mk_rootfs_part()
+mk_rootfs_part
 
 function mk_rootfs() {
 	# create ext4 filesystem
@@ -94,7 +94,7 @@ function mk_rootfs() {
 	fi
 	log_add "passed\n"
 }
-mk_rootfs()
+mk_rootfs
 
 function os_setup_pre() {
 	# check mount dir
@@ -114,7 +114,7 @@ function os_setup_pre() {
 	fi
 	log_add "passed\n"
 }
-os_setup_pre()
+os_setup_pre
 
 function os_setup() {
 	# Copy and untar rootfs
@@ -156,7 +156,7 @@ function os_setup() {
 
 	log_info "Installation was successful!\n"
 }
-os_setup()
+os_setup
 
 function os_setup_post() {
 	# Show must go on!
@@ -181,4 +181,4 @@ function os_setup_post() {
 	log_add "passed\n"
 	log_info "DONE.\n"
 }
-os_setup_post()
+os_setup_post
