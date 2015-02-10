@@ -71,14 +71,16 @@ function mk_rootfs_part_pre() {
 	log_add "passed\n"
 }
 
-# create DOS partition table and a new partition
-log_info "Create DOS partition table and a new partition... "
-err_msg=`echo -e "o\nn\np\n1\n\n\nw" | fdisk /dev/sda 2>&1 1>/dev/null`
-if [[ $? != 0 ]]; then
-	log_err "\nCan't create new partition: $err_msg \n"
-	exit 2
-fi
-log_add "passed\n"
+function mk_rootfs_part() {
+	# create DOS partition table and a new partition
+	log_info "Create DOS partition table and a new partition... "
+	err_msg=`echo -e "o\nn\np\n1\n\n\nw" | fdisk /dev/sda 2>&1 1>/dev/null`
+	if [[ $? != 0 ]]; then
+		log_err "\nCan't create new partition: $err_msg \n"
+		exit 2
+	fi
+	log_add "passed\n"
+}
 
 # create ext4 filesystem
 log_info "Create ext4 filesystem... "
