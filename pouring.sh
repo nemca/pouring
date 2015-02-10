@@ -28,6 +28,7 @@ function get_config_name() {
 	done
 }
 
+# read config
 config=`get_config_name()`
 if [[ -f $path_to_confs/$config ]]; then
 	source $path_to_confs/$config
@@ -37,40 +38,42 @@ fi
 
 log_info "Start installation\n"
 
-# check more than one disk
-log_info "Check local discks... "
-if [[ `sfdisk -s | awk -F: '!/total/ && /dev/ { print $1 }' | wc -l` < 1 ]]; then
-	log_err "Not found disks"
-	exit 1
-fi
-log_add "passed\n"
+function mk_rootfs_part_pre() {
+	log_info "Check local discks... "
+	# check more than one disk
+	if [[ `sfdisk -s | awk -F: "!/total/ && /$root_dev/ { print $1 }" | wc -l` < 1 ]]; then
+		log_err "Not found disks"
+		exit 1
+	fi
+	log_add "passed\n"
 
-# Check already mounted dev, sys, proc 
-log_info "Check already mounted dev, sys, proc... "
-for mount_point in dev sys proc; do
-	`mount | egrep "/mnt/$mount_point" 1>/dev/null 2>&1`
+	# Check already mounted dev, sys, proc 
+	log_info "Check already mounted dev, sys, proc... "
+	for mount_point in dev sys proc; do
+		`mount | egrep "/mnt/$mount_point" 1>/dev/null 2>&1`
+		if [[ $? == 0 ]]; then
+			err_msg=`umount /mnt/$mount_point 2>&1 1>/dev/null`
+			if [[ $? != 0 ]]; then
+				log_err "\n/dev/$mount_point mount is mounted. Try unmount failed: $err_msg \n"
+				exit 8
+			fi
+		fi
+	done
+	log_add "passed\n"
+
+	# check already mounted rootfs
+	log_info "Check already mounted rootfs... "
+	`mount | egrep "/dev/${root_dev}1" 1>/dev/null 2>&1`
 	if [[ $? == 0 ]]; then
-		err_msg=`umount /mnt/$mount_point 2>&1 1>/dev/null`
+		log_add "umount /dev/sda1... "
+		err_msg=`umount /dev/sda1 2>&1 1>/dev/null`
 		if [[ $? != 0 ]]; then
-			log_err "\n/dev/$mount_point mount is mounted. Try unmount failed: $err_msg \n"
-			exit 8
+			log_err "Disk /dev/sda1 is mounted. Try unmount failed: $err_msg \n"
+			exit 4
 		fi
 	fi
-done
-log_add "passed\n"
-
-# check already mounted rootfs
-log_info "Check already mounted rootfs... "
-`mount | egrep "/dev/sda1" 1>/dev/null 2>&1`
-if [[ $? == 0 ]]; then
-	log_add "umount /dev/sda1... "
-	err_msg=`umount /dev/sda1 2>&1 1>/dev/null`
-	if [[ $? != 0 ]]; then
-		log_err "Disk /dev/sda1 is mounted. Try unmount failed: $err_msg \n"
-		exit 4
-	fi
-fi
-log_add "passed\n"
+	log_add "passed\n"
+}
 
 # create DOS partition table and a new partition
 log_info "Create DOS partition table and a new partition... "
