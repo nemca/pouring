@@ -38,8 +38,7 @@ function mk_rootfs_part_pre() {
 	log_info "Check local discks... "
 	# check more than one disk
 	if [[ `sfdisk -s | awk -F: "!/total/ && /$root_dev/ { print $1 }" | wc -l` < 1 ]]; then
-		log_err "Not found disks"
-		exit 1
+		log_err "Not found disks" && exit 2
 	fi
 	log_add "ok\n"
 
@@ -50,8 +49,7 @@ function mk_rootfs_part_pre() {
 		if [[ $? == 0 ]]; then
 			err_msg=`umount /mnt/$mount_point 2>&1 1>/dev/null`
 			if [[ $? != 0 ]]; then
-				log_err "\n/dev/$mount_point mount is mounted. Try unmount failed: $err_msg \n"
-				exit 8
+				log_err "\n/dev/$mount_point mount is mounted. Try unmount failed: $err_msg \n" && exit 2
 			fi
 		fi
 	done
@@ -61,11 +59,10 @@ function mk_rootfs_part_pre() {
 	log_info "Check already mounted rootfs... "
 	`mount | egrep "/dev/${root_dev}1" 1>/dev/null 2>&1`
 	if [[ $? == 0 ]]; then
-		log_add "umount /dev/sda1... "
-		err_msg=`umount /dev/sda1 2>&1 1>/dev/null`
+		log_add "umount /dev/${root_dev}1... "
+		err_msg=`umount /dev/${root_dev}1 2>&1 1>/dev/null`
 		if [[ $? != 0 ]]; then
-			log_err "Disk /dev/sda1 is mounted. Try unmount failed: $err_msg \n"
-			exit 4
+			log_err "Disk /dev/sda1 is mounted. Try unmount failed: $err_msg \n" && exit 2
 		fi
 	fi
 	log_add "ok\n"
@@ -77,8 +74,7 @@ function mk_rootfs_part() {
 	log_info "Create DOS partition table and a new partition... "
 	err_msg=`echo -e "o\nn\np\n1\n\n\nw" | fdisk /dev/$root_dev 2>&1 1>/dev/null`
 	if [[ $? != 0 ]]; then
-		log_err "\nCan't create new partition: $err_msg \n"
-		exit 2
+		log_err "\nCan't create new partition: $err_msg \n" && exit 3
 	fi
 	log_add "ok\n"
 }
@@ -89,8 +85,7 @@ function mk_rootfs() {
 	log_info "Create ext4 filesystem... "
 	err_msg=`mkfs.ext4 /dev/${root_dev}1 2>&1 1>/dev/null`
 	if [[ $? != 0 ]]; then
-		log_err "\nCan't create filesystem: $err_msg \n"
-		exit 3
+		log_err "\nCan't create filesystem: $err_msg \n" && exit 4
 	fi
 	log_add "ok\n"
 }
@@ -109,8 +104,7 @@ function os_setup_pre() {
 	log_info "Mount local disk... "
 	err_msg=`mount -t ext4 /dev/${root_dev}1 /mnt/ 2>&1 1>/dev/null`
 	if [[ $? != 0 ]]; then
-		log_err "\nCan't mount local filesystem: $err_msg \n"
-		exit 5
+		log_err "\nCan't mount local filesystem: $err_msg \n" && exit 5
 	fi
 	log_add "ok\n"
 }
@@ -121,8 +115,7 @@ function os_setup() {
 	log_info "Copy and untar rootfs... "
 	err_msg=`cd /mnt && tar xzf /srv/images/$archive 2>&1 1>/dev/null`
 	if [[ $? != 0 ]]; then
-		log_err "\nCan't extrat rootfs from the archive: $err_msg \n"
-		exit 6
+		log_err "\nCan't extrat rootfs from the archive: $err_msg \n" && exit 6
 	fi
 	cd /
 	log_add "ok\n"
@@ -131,8 +124,7 @@ function os_setup() {
 	log_info "Install GRUB... "
 	err_msg=`grub-install --root-directory=/mnt /dev/$root_dev 2>&1 1>/dev/null`
 	if [[ $? != 0 ]]; then
-		log_err "\nCan't install grub: $err_msg \n"
-		exit 7
+		log_err "\nCan't install grub: $err_msg \n" && exit 6
 	fi
 	log_add "ok\n"
 
@@ -140,8 +132,7 @@ function os_setup() {
 	log_info "Mount dev, sys, proc... "
 	err_msg=`mount -t proc none /mnt/proc && mount --bind /dev/ /mnt/dev/ && mount --bind /sys/ /mnt/sys/ 2>&1 1>/dev/null`
 	if [[ $? != 0 ]]; then
-		log_err "\nFailed mount dev,sys,proc: $err_msg \n"
-		exit 9
+		log_err "\nFailed mount dev,sys,proc: $err_msg \n" && exit 6
 	fi
 	log_add "ok\n"
 
@@ -149,22 +140,21 @@ function os_setup() {
 	log_info "Update GRUB in chroot... "
 	err_msg=`chroot /mnt/ update-grub 2>&1 1>/dev/null`
 	if [[ $? != 0 ]]; then
-		log_err "\nFailed run update-grub in chroot: $err_msg \n"
-		exit 9
+		log_err "\nFailed run update-grub in chroot: $err_msg \n" && exit 6
 	fi
 	log_add "ok\n"
 
 	log_info "Set root password... "
 	err_msg=`chroot /mnt/ echo "root:$root_password" | chpasswd 2>&1 1>/dev/null`
 	if [[ $? != 0 ]]; then
-		log_err "\nFailed set root password: $err_msg \n" && exit 9
+		log_err "\nFailed set root password: $err_msg \n" && exit 6
 	fi
 	log_add "ok\n"
 
 	log_info "Permit ssh root login... "
 	err_msg=`chroot /mnt/ sed -i '/PermitRootLogin/s/no/yes/' /etc/ssh/sshd_config 2>&1 1>/dev/null`
 	if [[ $? != 0 ]]; then
-		log_err "\nFailed permit ssh root login: $err_msg \n" && exit 9
+		log_err "\nFailed permit ssh root login: $err_msg \n" && exit 6
 	fi
 	log_add "ok\n"
 
@@ -179,8 +169,7 @@ function os_setup_post() {
 	for mount_point in proc sys dev; do
 		err_msg=`umount /mnt/$mount_point 2>&1 1>/dev/null`
 		if [[ $? != 0 ]]; then
-			log_err "\n/dev/$mount_point mount is mounted. Try unmount failed: $err_msg \n"
-			exit 10
+			log_err "\n/dev/$mount_point mount is mounted. Try unmount failed: $err_msg \n" && exit 7
 		fi
 	done
 	log_add "ok\n"
@@ -189,8 +178,7 @@ function os_setup_post() {
 	log_info "Umount rootfs... "
 	err_msg=`umount /dev/${root_dev}1 2>&1 1>/dev/null`
 	if [[ $? != 0 ]]; then
-		log_err "\n/dev/${root_dev}1 mount is mounted. Try unmount failed: $err_msg \n"
-		exit 11
+		log_err "\n/dev/${root_dev}1 mount is mounted. Try unmount failed: $err_msg \n" && exit 7
 	fi
 	log_add "ok\n"
 	log_info "DONE.\n"
