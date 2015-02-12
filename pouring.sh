@@ -161,6 +161,13 @@ function os_setup() {
 	fi
 	log_add "ok\n"
 
+	log_info "Permit ssh root login... "
+	err_msg=`chroot /mnt/ sed -i '/PermitRootLogin/s/no/yes/' /etc/ssh/sshd_config 2>&1 1>/dev/null`
+	if [[ $? != 0 ]]; then
+		log_err "\nFailed permit ssh root login: $err_msg \n" && exit 9
+	fi
+	log_add "ok\n"
+
 	log_info "Installation was successful!\n"
 }
 os_setup
