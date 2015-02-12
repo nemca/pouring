@@ -154,6 +154,13 @@ function os_setup() {
 	fi
 	log_add "ok\n"
 
+	log_info "Set root password... "
+	err_msg=`chroot /mnt/ echo "root:$root_password" | chpasswd 2>&1 1>/dev/null`
+	if [[ $? != 0 ]]; then
+		log_err "\nFailed set root password: $err_msg \n" && exit 9
+	fi
+	log_add "ok\n"
+
 	log_info "Installation was successful!\n"
 }
 os_setup

@@ -1,2 +1,3 @@
 root_dev="sda"
 archive="niitp-ubuntu-minimal-amd64.tgz"
+root_password="password"
