@@ -164,6 +164,14 @@ os_setup
 
 function os_setup_post() {
 	# Show must go on!
+	# Remove udev rules
+	log_info "Remove udev rules... "
+	err_msg=`chroot /mnt/ rm -f /etc/udev/rules.d/* 2>&1 1>/dev/null`
+	if [[ $? != 0 ]]; then
+		log_err "\nFailed remove udev rules: $err_msg \n" && exit 7
+	fi
+	log_add "ok\n"
+
 	# Umount proc, sys, dev
 	log_info "Umount dev, sys, proc... "
 	for mount_point in proc sys dev; do
